@@ -1,5 +1,7 @@
 # blazor-tracalorie
 
+A simple todo-like client-side app that keep track of a list of meals and calories, calculate the total and persist the list to the browser's local storage.
+
 This is a Blazor porting of a Brad Traversy's exercise originally written in javascript that you can find on his Udemy course: [https://www.udemy.com/course/modern-javascript-from-the-beginning/](https://www.udemy.com/course/modern-javascript-from-the-beginning/)
 
 ## Prerequisites
