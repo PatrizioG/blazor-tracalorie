@@ -1,0 +1,91 @@
+﻿@page "/"
+@inject BlazorTracalorie.Helpers.ILocalStorageService localStorage
+
+<!-- Navbar -->
+<Nav ClearAll="ClearAll"></Nav>
+<br>
+
+<div class="container">
+    <FormCard @ref="formCard"
+              AddEventCallback="AddMeal"
+              UpdateEventCallback="UpdateMeal"
+              DeleteEventCallback="DeleteMeal">
+    </FormCard>
+
+    <!-- Calorie Count -->
+    <TotalCalories Total="total"></TotalCalories>
+
+    <!-- Item List -->
+    <MealList Meals="Meals" EditMealRequest="EditMealRequest"></MealList>
+</div>
+
+@code
+{
+    private int total = 0;
+
+    public ICollection<Meal> Meals { get; set; } = new List<Meal>();
+
+    private FormCard formCard;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Meals = await localStorage.GetMealsFromStorage();
+        CalculateTotal();
+    }
+
+    private void EditMealRequest(Meal meal)
+    {
+        formCard.SetEditState();
+        formCard.Meal = meal;
+    }
+
+    private async Task AddMeal(Meal meal)
+    {
+        int nextId = 0;
+        if (Meals.Any())
+        {
+            var maxId = Meals.Select(m => m.Id).Max();
+            nextId = ++maxId;
+        }
+
+        meal.Id = nextId;
+        Meals.Add(meal);
+        await localStorage.UpdateMealStorage(Meals);
+
+        CalculateTotal();
+    }
+
+    private async Task UpdateMeal(Meal meal)
+    {
+        var mealToUpdate = Meals.Where(m => m.Id == meal.Id).FirstOrDefault();
+        if (mealToUpdate != null)
+        {
+            mealToUpdate.Name = meal.Name;
+            mealToUpdate.Calories = meal.Calories;
+        }
+
+        await localStorage.UpdateMealStorage(Meals);
+        CalculateTotal();
+    }
+
+    private async Task DeleteMeal(Meal meal)
+    {
+        Meals.Remove(meal);
+
+        await localStorage.UpdateMealStorage(Meals);
+        CalculateTotal();
+    }
+
+    private async Task ClearAll()
+    {
+        Meals.Clear();
+
+        await localStorage.UpdateMealStorage(Meals);
+        CalculateTotal();
+    }
+
+    private void CalculateTotal()
+    {
+        total = Meals.Select(m => int.Parse(m.Calories)).Sum();
+    }
+}

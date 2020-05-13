@@ -1,0 +1,17 @@
+﻿@if (Meals.Any())
+{
+    <ul id="item-list" class="collection">
+        @foreach (var meal in Meals)
+        {
+        <RowMeal @key="meal.Id" Meal="meal" EditEventCallback="(e) => EditMealRequest.InvokeAsync(meal)"></RowMeal>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter]
+    public ICollection<Meal> Meals { get; set; }
+
+    [Parameter]
+    public EventCallback<Meal> EditMealRequest { get; set; }
+}

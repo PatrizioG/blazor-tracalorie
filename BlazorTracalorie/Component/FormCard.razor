@@ -1,0 +1,83 @@
+﻿@inject IJSRuntime jsRuntime
+
+<div class="card">
+    <div class="card-content">
+        <span class="card-title">Add Meal / Food Item</span>
+        <EditForm Model="@Meal" class="col" OnValidSubmit="@AddMeal">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <ValidationSummary></ValidationSummary>
+
+            <div class="row">
+                <div class="input-field col s6">
+                    <input type="text" placeholder="Add Item" id="item-name" @bind="@Meal.Name" />
+                    <!--<label for="item-name">Meal</label>-->
+                </div>
+                <div class="input-field col s6">
+                    <input type="number" placeholder="Add Calories" id="item-calories" @bind="@Meal.Calories" />
+                    <!--<label for="item-calories">Calories</label>-->
+                </div>
+
+                @if (!IsEdit)
+                {
+                    <button type="submit" class="add-btn btn blue darken-3"><i class="fa fa-plus"></i> Add Meal</button>
+                }
+                else
+                {
+                    <button type="button" class="update-btn btn orange" @onclick="UpdateMeal"><i class="fa fa-pencil-square-o"></i> Update Meal</button>
+                    <button type="button" class="delete-btn btn red"@onclick="DeleteMeal"><i class="fa fa-remove"></i> Delete Meal</button>
+                    <button type="button" class="back-btn btn grey pull-right" @onclick="SetAddState"><i class="fa fa-chevron-circle-left"></i> Back</button>
+                }
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    private bool IsEdit { get; set; } = false;
+
+    public Meal Meal { get; set; }
+
+    [Parameter]
+    public EventCallback<Meal> AddEventCallback { get; set; }
+
+    [Parameter]
+    public EventCallback<Meal> UpdateEventCallback { get; set; }
+
+    [Parameter]
+    public EventCallback<Meal> DeleteEventCallback { get; set; }
+
+    public void SetEditState()
+    {
+        IsEdit = true;
+    }
+
+    public void SetAddState()
+    {
+        Meal = new Meal() { Name = "", Calories = "" };
+        IsEdit = false;
+    }
+
+    protected override void OnInitialized()
+    {
+        Meal = new Meal() { Name = "", Calories = "" };
+    }
+
+    private async Task AddMeal()
+    {
+        await AddEventCallback.InvokeAsync(Meal);
+        Meal = new Meal() { Name = "", Calories = "" };
+    }
+
+    private async Task DeleteMeal()
+    {
+        await DeleteEventCallback.InvokeAsync(Meal);
+        SetAddState();
+    }
+
+    private async Task UpdateMeal()
+    {
+        await UpdateEventCallback.InvokeAsync(Meal);
+        SetAddState();
+    }
+}

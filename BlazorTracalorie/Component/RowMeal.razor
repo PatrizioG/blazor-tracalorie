@@ -1,0 +1,20 @@
+﻿<li class="collection-item" id="item-@Meal.Id">
+    <strong>@Meal.Name: </strong> <em>@Meal.Calories Calories</em>
+    <a href="" class="secondary-content">
+        <i class="fa fa-pencil" @onclick="Edit"></i>
+    </a>
+</li>
+
+@code {
+
+    [Parameter]
+    public Meal Meal { get; set; }
+
+    [Parameter]
+    public EventCallback EditEventCallback { get; set; }
+
+    private void Edit(MouseEventArgs e)
+    {
+        EditEventCallback.InvokeAsync(e);
+    }
+}
